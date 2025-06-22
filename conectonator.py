@@ -9,6 +9,8 @@ class connectanator:
         self.turn = 0
 
     def players_move(self, case:str="default"):
+        # this is taking text input from a prompt and making the move so ill probs change it to work with a mouse in a whiley
+        # will defo need reworked
         players_turn = self.get_player_name()
         while True:
             match case:
