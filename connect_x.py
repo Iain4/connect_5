@@ -9,8 +9,8 @@ Collin = Connecty_Collin(CONNECT_NUM)
 def main():
     game = Gameplay_Happenater(
         connect_num=CONNECT_NUM,
-        players=(Collin, Randy),
-        frame_rate=1
+        players=(Randy, Collin),
+        frame_rate=6
     )
     game.game_loop()
 

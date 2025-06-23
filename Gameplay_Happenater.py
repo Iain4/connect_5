@@ -103,7 +103,7 @@ class Gameplay_Happenater(Base_Connectanator):
     
     def get_player(self):
         # redefining compared to the bot one cause this is nicer and works for this class
-        return self.turn % 2 + 1
+        return int(self.turn % 2 + 1)
 
     def set_running(self, val:bool):
         self.running = val

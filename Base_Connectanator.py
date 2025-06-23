@@ -28,7 +28,7 @@ class Base_Connectanator():
             return None
         
 
-    def place_counter(self, move=-1):
+    def place_counter(self, board, move=-1):
         if move == -1:
             move = self.move
 
@@ -40,8 +40,8 @@ class Base_Connectanator():
             elif i == self.rows-1:
                 placement = (i, move)
 
-        self.board[placement] = self.get_player()
-        return placement
+        board[placement] = self.get_player()
+        return board, placement
 
 
     def game_turn(self, players_move=None):
@@ -51,80 +51,46 @@ class Base_Connectanator():
             return False, self.get_player()
         
         self.set_move(move)
-        placement = self.place_counter()
-        winner = self.any_winners(placement)
+        self.board, placement = self.place_counter(self.board, move)
+        winner = self.win_check(self.board, placement)
         if not winner:
-            self.turn += 1
+            self.turn += 1.
         return winner, self.get_player()
 
 
-    def any_winners(self, placement):
-        # think there might be a better way to return the value of this 
-        # and defo need to rewite the detection cause 'tis fugly
+    def find_connected(self, board, spot):
         o = self.get_player()
-        row, col = placement
+        if board[spot] != o:
+            return [0,0,0,0]
+        
+        direcs = [(1,0), (0,1), (1,1), (-1,1)]
+        signs = (1,-1)
+        # connecteds is a list of the number of the same counters conected to the spot in the four directions:
+        # column, row, downwards diag, upwards diag
+        connecteds = []
+        for d in direcs:
+            connected = 0
+            for sign in signs:
+                test_spot = spot
+                while True:
+                    test_spot = (test_spot[0]+d[0]*sign, test_spot[1]+d[1]*sign)
+                    try:
+                        if board[test_spot] == o:
+                            connected += 1
+                        else:
+                             break
+                    except IndexError:
+                        break
+            connecteds += [connected]
+        return connecteds
+                
 
-        # checking rows
-        connected = 0
-        for i in range(self.rows):
-            if self.board[i, col] == o:
-                connected += 1
-                if connected == self.connect_num:
-                    return True
-            else: 
-                connected = 0
-
-        # checking cols
-        connected = 0
-        for i in range(self.slots):
-            if self.board[row, i] == o:
-                connected += 1
-                if connected == self.connect_num:
-                    return True
-            else: 
-                connected = 0
-    
-        # checking down-sloppiong diagonal
-        connected = 0
-        if col > row:
-            c = col - row
-            r = 0
-        else:
-            r = row - col
-            c = 0
-        for i in range(self.rows):
-            if self.board[r, c] == o:
-                connected += 1
-                if connected == self.connect_num:
-                    return True
-            else:
-                connected = 0
-
-            r += 1; c += 1
-            if r == self.rows or c == self.slots:
-                break
-            
-        # checking upwards diagonals 
-        connected = 0
-        R = self.rows - 1
-        if col + row > R:
-            r = R
-            c = col - (R - row)
-        else:
-            c = 0
-            r = row + col
-        for i in range(self.rows):
-            if self.board[r, c] == o:
-                connected += 1
-                if connected == self.connect_num:
-                    return True
-            else:
-                connected = 0
-
-            r -= 1; c += 1
-            if r == -1 or c == self.slots:
-                break
+    def win_check(self, board, spot):
+        connecteds = self.find_connected(board, spot)
+        if max(connecteds) >= self.connect_num-1:
+            return True
         return False
+
 
     def get_player_name(self):
         return self.players[self.get_player()-1]
@@ -140,7 +106,7 @@ class Base_Connectanator():
         return self.board.copy()
     
     def set_board(self, board):
-        self.board = board
+        self.board = board.copy()
     
     def set_move(self, move):
         self.move = move
