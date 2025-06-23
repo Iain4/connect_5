@@ -19,7 +19,7 @@ class Gameplay_Happenater(Base_Connectanator):
         self.screen = pg.display.set_mode(res)
 
         self.connect_num = connect_num
-        self.players = players
+        self.players = (players[0], players[1])
         self.res = res
         self.frame_rate = frame_rate
         self.running = False

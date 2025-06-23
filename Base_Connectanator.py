@@ -135,5 +135,8 @@ class Base_Connectanator():
     def get_board(self):
         return self.board
     
+    def set_board(self, board):
+        self.board = board
+    
     def set_move(self, move):
         self.move = move
