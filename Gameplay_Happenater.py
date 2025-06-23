@@ -54,7 +54,7 @@ class Gameplay_Happenater():
                     self.curr_slot = int((self.curr_slot - 1) % self.slots)
                 elif event.key == pg.K_RIGHT:
                     self.curr_slot = int((self.curr_slot + 1) % self.slots)
-                elif event.key == pg.K_RETURN:
+                elif event.key in (pg.K_RETURN, pg.K_SPACE):
                     return self.curr_slot
         return None
 

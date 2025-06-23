@@ -7,7 +7,7 @@ CONNECT_NUM = 5
 
 
 def main():
-    fe = Gameplay_Happenater(CONNECT_NUM, res=(1920,1080))
+    fe = Gameplay_Happenater(CONNECT_NUM)
     be = Base_Connectanator(CONNECT_NUM)
 
     fe.set_running(True)
