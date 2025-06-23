@@ -5,7 +5,7 @@ class connectanator:
         self.rows = self.slots - 1
         self.moves = range(1, self.slots+1)
         self.players = ("Player 1", "Player 2") # ("Red", "Yellow")
-        self.board = numpy.zeros((self.rows, self.slots), dtype=int)
+        self.board = np.zeros((self.rows, self.slots), dtype=int)
         self.turn = 0
 
     def players_move(self, case:str="default"):
