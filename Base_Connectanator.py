@@ -10,6 +10,7 @@ class Base_Connectanator():
         self.board = np.zeros((self.rows, self.slots), dtype=int)
         self.turn = 0
 
+
     def check_move(self, move):
         if move is None:
             return None
@@ -26,7 +27,6 @@ class Base_Connectanator():
         except ValueError:
             return None
         
-
 
     def place_counter(self):
         col = self.board[:, self.move]

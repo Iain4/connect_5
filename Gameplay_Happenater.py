@@ -1,13 +1,16 @@
 import pygame as pg
 import numpy as np
+from Base_Connectanator import Base_Connectanator
 
-class Gameplay_Happenater():
+class Gameplay_Happenater(Base_Connectanator):
     def __init__(
             self,
             connect_num:int,
+            players:tuple=(None, None),
             res=(1280,720),
             frame_rate=30,
         ):
+        super().__init__(connect_num)
         pg.init()
         pg.key.set_repeat()
         pg.font.init()
@@ -16,12 +19,11 @@ class Gameplay_Happenater():
         self.screen = pg.display.set_mode(res)
 
         self.connect_num = connect_num
+        self.players = players
         self.res = res
         self.frame_rate = frame_rate
         self.running = False
-
-        self.slots = 2 * connect_num - 1
-        self.rows = self.slots - 1
+        
         self.slot_px = int(res[0] / self.slots)
         self.row_px = int(res[1] / self.rows)
         # making grid of circle centers:
@@ -31,15 +33,7 @@ class Gameplay_Happenater():
                 for j in range(self.rows)
         ]
         self.cir_rad = int(min([self.row_px, self.slot_px])/2 - 5)
-        self.board = np.zeros((self.rows, self.slots), dtype=int)
         self.curr_slot = 0
-
-
-    def game_runner(self, board):
-        self.set_board(board)
-        move = self.handle_inputs()
-        self.display_func()
-        return move
 
 
     def handle_inputs(self):
@@ -59,7 +53,7 @@ class Gameplay_Happenater():
         return None
 
 
-    def display_func(self):
+    def display(self):
         self.screen.fill((0,0,150))
         rect_left = int(self.grid[self.curr_slot*self.rows][0] - 0.5*self.slot_px)
         self.screen.fill(
@@ -80,9 +74,34 @@ class Gameplay_Happenater():
         pg.display.flip()
         self.clock.tick(self.frame_rate) 
 
+
+    def game_loop(self):
+        self.set_running(True)
+        while self.running:
+            # try:
+            self.display()
+            move = self.handle_inputs()
+            player = self.players[self.get_player()-1]
+
+            # for bot players
+            if player is not None:
+                move = player.make_move(self.board)
+
+            any_win, player_turn = self.game_turn(move)
+
+            if any_win:
+                print(f'Player {player_turn} Wins!!!')
+                print(self.get_board())
+                break
+
+            # except Exception as e:
+            #     pg.quit()
+            #     raise e
+        pg.quit()
+
+
     def set_running(self, val:bool):
         self.running = val
     
     def set_board(self, board):
         self.board = board
-    
