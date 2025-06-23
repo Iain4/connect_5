@@ -6,15 +6,18 @@ class Gameplay_Happenater():
             self,
             connect_num:int,
             res=(1280,720),
-            frame_rate=60,
+            frame_rate=30,
         ):
         pg.init()
-        pg.key.set_repeat(10)
+        pg.key.set_repeat()
+        pg.font.init()
+        self.pg_text = pg.font.SysFont(pg.font.get_default_font(), 12)
+        self.clock = pg.time.Clock()
+        self.screen = pg.display.set_mode(res)
+
         self.connect_num = connect_num
         self.res = res
-        self.screen = pg.display.set_mode(res)
         self.frame_rate = frame_rate
-        self.clock = pg.time.Clock()
         self.running = False
 
         self.slots = 2 * connect_num - 1
@@ -43,38 +46,39 @@ class Gameplay_Happenater():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.set_running(False)
-        
-        keys = pg.key.get_pressed()
-        if keys[pg.K_ESCAPE]:
-            self.set_running(False)
-        if True: #keys[pg.K_LEFT]:
-            self.curr_slot = int((self.curr_slot - 1) % self.slots)
-        if keys[pg.K_RIGHT]:
-            self.curr_slot = int((self.curr_slot + 1) % self.slots)
-        if keys[pg.K_RETURN]:
-            return self.curr_slot
+                
+            elif event.type == pg.KEYDOWN:    
+                if event.key == pg.K_ESCAPE:
+                    self.set_running(False)
+                elif event.key == pg.K_LEFT:
+                    self.curr_slot = int((self.curr_slot - 1) % self.slots)
+                elif event.key == pg.K_RIGHT:
+                    self.curr_slot = int((self.curr_slot + 1) % self.slots)
+                elif event.key == pg.K_RETURN:
+                    return self.curr_slot
         return None
 
 
     def display_func(self):
         self.screen.fill((0,0,150))
-        rect_left = int(self.grid[self.curr_slot][0] - 0.5*self.slot_px)
+        rect_left = int(self.grid[self.curr_slot*self.rows][0] - 0.5*self.slot_px)
         self.screen.fill(
-            color="Yellow",
-            rect=(rect_left, 0, 2*self.cir_rad, self.res[1])
+            color="Orange",
+            rect=(rect_left, 0, self.slot_px, self.res[1])
         )
         colors = ["Black", "Red", "Yellow"]
         for n, point in enumerate(self.grid):
-            c = colors[self.board.flatten()[n]]
+            c = colors[self.board.flatten('F')[n]]
             pg.draw.circle(
                 surface=self.screen,
                 color=c,
                 center=point,
                 radius=self.cir_rad
             )
+        text_surf = self.pg_text.render(f'Slot={self.curr_slot}', False, (0,0,0))
+        self.screen.blit(text_surf, (1,1))
         pg.display.flip()
-        self.clock.tick(self.frame_rate)
-    
+        self.clock.tick(self.frame_rate) 
 
     def set_running(self, val:bool):
         self.running = val

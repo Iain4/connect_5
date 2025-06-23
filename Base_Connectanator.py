@@ -10,18 +10,22 @@ class Base_Connectanator():
         self.board = np.zeros((self.rows, self.slots), dtype=int)
         self.turn = 0
 
-    def players_move(self, move):
+    def check_move(self, move):
+        if move is None:
+            return None
         try: 
             move = int(move)
+
+            if move not in self.moves:
+                return None
+            elif self.board[0, move] != 0:
+                return None
+            else: 
+                return move
+            
         except ValueError:
             return None
         
-        if move not in self.moves:
-            return None
-        elif self.board[0, move] != 0:
-            return None
-        else: 
-            return move
 
 
     def place_counter(self):
@@ -38,15 +42,18 @@ class Base_Connectanator():
 
 
     def game_turn(self, players_move=None):
-        if players_move is None:
+        move = self.check_move(players_move)
+        
+        if move == None:
             return False, self.get_player()
         
-        self.set_move(players_move)
+        self.set_move(move)
         placement = self.place_counter()
         winner = self.any_winners(placement)
         if not winner:
             self.turn += 1
         return winner, self.get_player()
+        
 
     def any_winners(self, placement):
         # think there might be a better way to return the value of this 
