@@ -28,14 +28,17 @@ class Base_Connectanator():
             return None
         
 
-    def place_counter(self):
-        col = self.board[:, self.move]
+    def place_counter(self, move=-1):
+        if move == -1:
+            move = self.move
+
+        col = self.board[:, move]
         for i, val in enumerate(col):
             if val != 0:
-                placement = (i-1, self.move)
+                placement = (i-1, move)
                 break
             elif i == self.rows-1:
-                placement = (i, self.move)
+                placement = (i, move)
 
         self.board[placement] = self.get_player()
         return placement
@@ -53,7 +56,7 @@ class Base_Connectanator():
         if not winner:
             self.turn += 1
         return winner, self.get_player()
-        
+
 
     def any_winners(self, placement):
         # think there might be a better way to return the value of this 
@@ -126,17 +129,39 @@ class Base_Connectanator():
     def get_player_name(self):
         return self.players[self.get_player()-1]
     
-    def get_turn(self):
-        return self.turn
-    
     def get_player(self):
-        return self.turn % 2 + 1
+        # done like this so it works for the bots which don't have a turn count
+        tot = np.sum(self.board)
+        if tot == 1:
+            return 2
+        return int(tot % 3) + 1
     
     def get_board(self):
-        return self.board
+        return self.board.copy()
     
     def set_board(self, board):
         self.board = board
     
     def set_move(self, move):
         self.move = move
+
+    def make_move(self, board)->int:
+        """To be implemented for any connect bots. The bot will get the current board from the Game_Happenator and can runs its logic off of that. The function should begin with a self.set_board(board).
+
+        Parameters
+        ----------
+        board : numpy.ndarray
+            The current connect-n board state.
+
+        Returns
+        -------
+        int
+            The move the bot wants to make. Need to be in range(self.slots).
+
+        Raises
+        ------
+        NotImplementedError
+            _description_
+        """
+        raise NotImplementedError("The make_move function has not been implemented in the current connect-x bot.")
+        

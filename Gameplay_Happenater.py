@@ -1,5 +1,4 @@
 import pygame as pg
-import numpy as np
 from Base_Connectanator import Base_Connectanator
 
 class Gameplay_Happenater(Base_Connectanator):
@@ -8,7 +7,7 @@ class Gameplay_Happenater(Base_Connectanator):
             connect_num:int,
             players:tuple=(None, None),
             res=(1280,720),
-            frame_rate=30,
+            frame_rate=60,
         ):
         super().__init__(connect_num)
         pg.init()
@@ -83,9 +82,9 @@ class Gameplay_Happenater(Base_Connectanator):
             move = self.handle_inputs()
             player = self.players[self.get_player()-1]
 
-            # for bot players
+            # for bot players, overwrites whatever the handle_inputs has done
             if player is not None:
-                move = player.make_move(self.board)
+                move = player.make_move(self.get_board())
 
             any_win, player_turn = self.game_turn(move)
 
@@ -99,6 +98,12 @@ class Gameplay_Happenater(Base_Connectanator):
             #     raise e
         pg.quit()
 
+    def get_turn(self):
+        return self.turn
+    
+    def get_player(self):
+        # redefining compared to the bot one cause this is nicer and works for this class
+        return self.turn % 2 + 1
 
     def set_running(self, val:bool):
         self.running = val
