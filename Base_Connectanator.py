@@ -1,44 +1,28 @@
-class connectanator:
+import numpy as np
+
+class Base_Connectanator():
     def __init__(self, connect_num:int=4):
         self.connect_num = connect_num
         self.slots = 2 * connect_num -1
         self.rows = self.slots - 1
-        self.moves = range(1, self.slots+1)
+        self.moves = range(self.slots)
         self.players = ("Player 1", "Player 2") # ("Red", "Yellow")
         self.board = np.zeros((self.rows, self.slots), dtype=int)
         self.turn = 0
 
-    def players_move(self, case:str="default"):
-        # this is taking text input from a prompt and making the move so ill probs change it to work with a mouse in a whiley
-        # will defo need reworked
-        players_turn = self.get_player_name()
-        while True:
-            match case:
-                case "default":
-                    move = input(f"The {players_turn} player puts their counter in slot...")
-                case "bad_input":
-                    move = input(f"The {players_turn} player didn't realise they had to put their counter in slot 1-{self.slots}. (Type 'exit' to close the game.)")
-                case "full":
-                    move = input(f"The {players_turn} player tried to put their counter in the full slot {full_col}, however they get to try again...(Type 'exit' to close the game.)")
-                case "all_g":
-                    self.move = checked_move-1
-                    break
+    def players_move(self, move):
+        try: 
+            move = int(move)
+        except ValueError:
+            return None
+        
+        if move not in self.moves:
+            return None
+        elif self.board[0, move] != 0:
+            return None
+        else: 
+            return move
 
-            if move == 'exit':
-                raise Exception
-            
-            try: 
-                move = int(move)
-            except ValueError:
-                case = "bad_input"; continue
-            
-            if move not in self.moves:
-                case = "bad_input"
-            elif self.board[0, move-1] != 0:
-                full_col = move; case = "full"
-            else: 
-                checked_move = move; case = "all_g"
-            
 
     def place_counter(self):
         col = self.board[:, self.move]
@@ -53,18 +37,20 @@ class connectanator:
         return placement
 
 
-    def game_turn(self):
-        self.players_move()
+    def game_turn(self, players_move=None):
+        if players_move is None:
+            return False, self.get_player()
+        
+        self.set_move(players_move)
         placement = self.place_counter()
         winner = self.any_winners(placement)
-        if winner:
-            print(f"{self.get_player_name()} Wins!!!")
-            print(self.board)
-            raise Exception
-        self.turn += 1
-
+        if not winner:
+            self.turn += 1
+        return winner, self.get_player()
 
     def any_winners(self, placement):
+        # think there might be a better way to return the value of this 
+        # and defo need to rewite the detection cause 'tis fugly
         o = self.get_player()
         row, col = placement
 
@@ -141,3 +127,6 @@ class connectanator:
     
     def get_board(self):
         return self.board
+    
+    def set_move(self, move):
+        self.move = move
