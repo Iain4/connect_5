@@ -21,6 +21,8 @@ class Gameplay_Happenater(Base_Connectanator):
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode(res)
 
+        self.state = None
+        self.state_changed = False
         self.connect_num = connect_num
         self.players = (players[0], players[1])
         self.res = res
@@ -42,7 +44,7 @@ class Gameplay_Happenater(Base_Connectanator):
     def handle_inputs(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                self.set_running(False)
+                self.set_state("close")
                 
             elif event.type == pg.KEYDOWN:    
                 if event.key == pg.K_ESCAPE:
@@ -56,13 +58,27 @@ class Gameplay_Happenater(Base_Connectanator):
         return None
 
 
-    def display(self):
+    def game_turn(self, players_move=None):
+        move = self.check_move(players_move)
+        if move == None:
+            return False
+        
+        self.set_move(move)
+        self.board, placement = self.place_counter(self.board, move)
+        winner = self.win_check(self.board, placement)
+        if not winner:
+            self.turn += 1
+        return winner
+    
+
+    def game_display(self, show_player=False):
         self.screen.fill((0,0,150))
-        rect_left = int(self.grid[self.curr_slot*self.rows][0] - 0.5*self.slot_px)
-        self.screen.fill(
-            color="Orange",
-            rect=(rect_left, 0, self.slot_px, self.res[1])
-        )
+        if show_player:
+            rect_left = int(self.grid[self.curr_slot*self.rows][0] - 0.5*self.slot_px)
+            self.screen.fill(
+                color="Orange",
+                rect=(rect_left, 0, self.slot_px, self.res[1])
+            )
         colors = ["Black", "Red", "Yellow"]
         for n, point in enumerate(self.grid):
             c = colors[self.board.flatten('F')[n]]
@@ -75,32 +91,69 @@ class Gameplay_Happenater(Base_Connectanator):
         text_surf = self.pg_text.render(f'Slot={self.curr_slot}', False, (0,0,0))
         self.screen.blit(text_surf, (1,1))
         pg.display.flip()
-        self.clock.tick(self.frame_rate) 
+        self.clock.tick(self.frame_rate)
 
 
-    def game_loop(self):
+    def gaming(self):
+        self.game_display(self.players[0] == None or self.players[1] == None)
+
+        move = self.handle_inputs()
+        player = self.players[self.get_player()-1]
+
+        # for bot players, overwrites whatever the handle_inputs has done
+        if player is not None:
+            move = player.make_move(self.get_board())
+
+        any_win = self.game_turn(move)
+        if any_win:
+            self.set_state("won")
+
+
+    def start_menu(self):
+        self.set_state("gaming")
+    
+
+    def pause(self):
+        ...
+    
+
+    def win_screen(self):
+        self.game_display()
+        self.handle_inputs()
+        if self.state_changed:
+            winner = self.get_player()
+            print(f'Player {winner} Wins!!!')
+            print(self.get_board())
+
+
+    def run(self):
         self.set_running(True)
-        while self.running:
-            # try:
-            self.display()
-            move = self.handle_inputs()
-            player = self.players[self.get_player()-1]
-
-            # for bot players, overwrites whatever the handle_inputs has done
-            if player is not None:
-                move = player.make_move(self.get_board())
-
-            any_win, player_turn = self.game_turn(move)
-
-            if any_win:
-                print(f'Player {player_turn} Wins!!!')
-                print(self.get_board())
-                break
-
-            # except Exception as e:
-            #     pg.quit()
-            #     raise e
+        self.set_state("start_menu")
+        while self.running:    
+            state = self.get_state()
+            match state:
+                case "start_menu":
+                    self.start_menu()
+                case "gaming":
+                    self.gaming()
+                case "paused":
+                    self.pause()
+                case "won":
+                    self.win_screen()
+                case "close":
+                    self.set_running(False)
+                    break
+                case _:
+                    raise ValueError(f"The state <{state}> does not exist.")
+            self.state_changed = False
         pg.quit()
+                
+    def get_state(self):
+        return self.state
+
+    def set_state(self, state):
+        self.state = state
+        self.state_changed = True
 
     def get_turn(self):
         return self.turn

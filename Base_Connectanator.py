@@ -44,20 +44,6 @@ class Base_Connectanator():
         return board, placement
 
 
-    def game_turn(self, players_move=None):
-        move = self.check_move(players_move)
-        
-        if move == None:
-            return False, self.get_player()
-        
-        self.set_move(move)
-        self.board, placement = self.place_counter(self.board, move)
-        winner = self.win_check(self.board, placement)
-        if not winner:
-            self.turn += 1.
-        return winner, self.get_player()
-
-
     def find_connected(self, board, spot):
         counter = self.get_player()
         if board[spot] != counter:
@@ -92,7 +78,6 @@ class Base_Connectanator():
         if max(connecteds) >= self.connect_num-1:
             return True
         return False
-
 
     def get_player_name(self):
         return self.players[self.get_player()-1]

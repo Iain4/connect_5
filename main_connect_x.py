@@ -8,13 +8,19 @@ Randy = Randy_The_Izer(CONNECT_NUM)
 Collin = Connecty_Collin(CONNECT_NUM)
 Bob = Blocky_Bob(CONNECT_NUM)
 
+# TODO:
+# - perfect bot or NN
+# - start, pause and win screen
+# - animate peice drops - unlink frame rate and logic?
+# - make everything look better
+
 def main():
     game = Gameplay_Happenater(
         connect_num=CONNECT_NUM,
-        players=(Bob, None),
-        frame_rate=30
+        players=(Bob, Randy),
+        frame_rate=3
     )
-    game.game_loop()
+    game.run()
 
 if __name__ == "__main__":
     main()
