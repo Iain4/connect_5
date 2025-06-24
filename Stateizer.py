@@ -1,5 +1,6 @@
 from Gameplay_Happenater import Gameplay_Happenater
 import pygame as pg
+from pygame_extras import Button
 
 class Stateizer(Gameplay_Happenater):
     def __init__(
@@ -126,9 +127,25 @@ class Stateizer(Gameplay_Happenater):
     
     ### start_menu state ###
     def start_menu(self):
-        self.set_state("gaming")
+        self.draw_game_board(self.get_board())
+        pose = (int(self.res[0]/2), int(self.res[1]/2)) 
+        dim = (int(0.33*self.res[0]), int(0.2*self.res[1]))
+
+        start_button = Button(
+            pose,
+            dim,
+            text="START"
+        )
+        start_button.draw(self.screen)
+        self.handle_inputs()
+        # self.set_state("gaming")
+        self.render()
     
 
     ### paused state ###
     def pause(self):
         self.handle_inputs()
+
+
+
+
