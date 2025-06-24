@@ -11,9 +11,12 @@ class Base_Connectanator():
         self.turn = 0
 
 
-    def check_move(self, move):
+    def check_move(self, move, board=None):
+        if board is None:
+            board = self.board
         if move is None:
             return None
+        
         try: 
             move = int(move)
 
@@ -28,7 +31,7 @@ class Base_Connectanator():
             return None
         
 
-    def place_counter(self, board, move):
+    def place_counter(self, board, move, counter):
         col = self.board[:, move]
         for i, val in enumerate(col):
             if val != 0:
@@ -37,12 +40,11 @@ class Base_Connectanator():
             elif i == self.rows-1:
                 placement = (i, move)
 
-        board[placement] = self.get_player()
+        board[placement] = counter
         return board, placement
 
 
-    def find_connected(self, board, spot):
-        counter = self.get_player()
+    def find_connected(self, board, spot, counter):
         if board[spot] != counter:
             return [0,0,0,0]
         
@@ -71,7 +73,7 @@ class Base_Connectanator():
                 
 
     def win_check(self, board, spot):
-        connecteds = self.find_connected(board, spot)
+        connecteds = self.find_connected(board, spot, self.get_player())
         if max(connecteds) >= self.connect_num-1:
             return True
         return False

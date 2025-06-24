@@ -4,14 +4,11 @@ import numpy as np
 class Blocky_Bob(Base_Connectanator):
     def __init__(self, connect_num):
         super().__init__(connect_num)
-
-    def get_player(self):
-        # faking that bob is the other player, so it will find their best move and play it instead
-        return int(super().get_player() % 2) + 1
+        
     
     def make_move(self, board):
         self.set_board(board)
-
+        o = (self.get_player() % 2) + 1
         best_connecs = [0,0,0,0]
         best_move = None
 
@@ -21,9 +18,9 @@ class Blocky_Bob(Base_Connectanator):
             move = self.check_move(i)
             if move == None:
                 continue
-            board, spot = self.place_counter(board, i)
-            connecs = self.find_connected(board, spot)
-            
+            board, spot = self.place_counter(board, i, o)
+            connecs = self.find_connected(board, spot, o)
+
             for n,m in zip(sorted(connecs, reverse=True), sorted(best_connecs, reverse=True)):
                 if n > m:
                     best_connecs = connecs

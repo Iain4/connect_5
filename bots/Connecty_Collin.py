@@ -4,21 +4,21 @@ import numpy as np
 class Connecty_Collin(Base_Connectanator):
     def __init__(self, connect_num):
         super().__init__(connect_num=connect_num)
-        self.player_num = None
 
     def make_move(self, board)->int:
         self.set_board(board)
         best_connecs = [0,0,0,0]
         best_move = None
-
+        o = self.get_player()
+        
         for i in range(self.slots):
             board = self.get_board()
             
             move = self.check_move(i)
             if move == None:
                 continue
-            board, spot = self.place_counter(board, i)
-            connecs = self.find_connected(board, spot)
+            board, spot = self.place_counter(board, i, o)
+            connecs = self.find_connected(board, spot, o)
             
             for n,m in zip(sorted(connecs, reverse=True), sorted(best_connecs, reverse=True)):
                 if n > m:

@@ -63,7 +63,7 @@ class Gameplay_Happenater(Base_Connectanator):
         if move == None:
             return False
         
-        self.board, placement = self.place_counter(self.board, move)
+        self.board, placement = self.place_counter(self.board, move, self.get_player())
         winner = self.win_check(self.board, placement)
         if winner:
             # lets me find the winning move more easily
@@ -143,7 +143,7 @@ class Gameplay_Happenater(Base_Connectanator):
         pg.display.flip()
         self.clock.tick(self.frame_rate)
 
-
+    # TODO: Fix edge case for drawing line where two different line are completed at one
     def win_screen(self, new_win=False):
         if new_win:
             winner = self.get_player()
