@@ -1,6 +1,7 @@
 import numpy as np
 
 class Base_Connectanator():
+    # this class does the gameplay rules
     def __init__(self, connect_num:int=4):
         self.connect_num = connect_num
         self.slots = 2 * connect_num -1
