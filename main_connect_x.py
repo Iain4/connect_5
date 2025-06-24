@@ -14,12 +14,12 @@ Bob = Blocky_Bob(CONNECT_NUM)
 # - animate peice drops - unlink frame rate and logic?
 # - make everything look better
 
-players = (Bob, Collin)
+players = (Bob, Bob)
 def main():
     game = Gameplay_Happenater(
         connect_num=CONNECT_NUM,
         players=players,
-        frame_rate=60 if not any(players) else 10,
+        frame_rate=60 if not any(players) else 8,
         # res=(1920, 1080)
     )
     game.run()

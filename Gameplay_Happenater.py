@@ -40,21 +40,33 @@ class Gameplay_Happenater(Base_Connectanator):
         self.cir_rad = int(min([self.row_px, self.slot_px])/2 - 5)
         self.curr_slot = 0
 
-
+    # will need to make handle inputs state depedant
+    # or write a new one for each state once i make menus
     def handle_inputs(self):
+        # returns the players move
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.set_state("close")
                 
-            elif event.type == pg.KEYDOWN:    
-                if event.key == pg.K_ESCAPE:
-                    self.set_running(False)
-                elif event.key == pg.K_LEFT:
-                    self.curr_slot = int((self.curr_slot - 1) % self.slots)
-                elif event.key == pg.K_RIGHT:
-                    self.curr_slot = int((self.curr_slot + 1) % self.slots)
-                elif event.key in (pg.K_RETURN, pg.K_SPACE):
-                    return self.curr_slot
+            elif event.type == pg.KEYDOWN:
+                match event.key:
+                    # escape needs to pause / play etc. so gets its own match case
+                    case pg.K_ESCAPE:
+                        match self.get_state():
+                            case "gaming":
+                                self.set_state("paused")
+                            case "won":
+                                self.set_state("close")
+                            case "paused":
+                                self.set_state("gaming")
+                    case pg.K_q:
+                        self.set_state("close")
+                    case pg.K_LEFT:
+                        self.curr_slot = int((self.curr_slot - 1) % self.slots)
+                    case pg.K_RIGHT:
+                        self.curr_slot = int((self.curr_slot + 1) % self.slots)
+                    case pg.K_RETURN | pg.K_SPACE:
+                        return self.curr_slot
         return None
 
 
@@ -119,7 +131,7 @@ class Gameplay_Happenater(Base_Connectanator):
     
 
     def pause(self):
-        ...
+        self.handle_inputs()
     
 
     def win_display(self, win_spots):
