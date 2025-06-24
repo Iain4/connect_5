@@ -7,7 +7,7 @@ class Randy_The_Izer(Base_Connectanator):
 
     def make_move(self, board)->int:
         self.set_board(board)
-
+            
         while True:
             move = np.random.randint(0, self.slots)
             move = self.check_move(move)

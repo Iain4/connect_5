@@ -1,13 +1,17 @@
 from Base_Connectanator import Base_Connectanator
 import numpy as np
 
-class Connecty_Collin(Base_Connectanator):
+class Blocky_Bob(Base_Connectanator):
     def __init__(self, connect_num):
-        super().__init__(connect_num=connect_num)
-        self.player_num = None
+        super().__init__(connect_num)
 
-    def make_move(self, board)->int:
+    def get_player(self):
+        # faking that bob is the other player, so it will find their best move and play it instead
+        return int(super().get_player() % 2) + 1
+    
+    def make_move(self, board):
         self.set_board(board)
+
         best_connecs = [0,0,0,0]
         best_move = None
 

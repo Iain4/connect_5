@@ -1,6 +1,10 @@
 import pygame as pg
 from Base_Connectanator import Base_Connectanator
 
+# TODO:  
+# - start menu and end of game screen
+# - draw detection / maximum number of peices
+
 class Gameplay_Happenater(Base_Connectanator):
     def __init__(
             self,

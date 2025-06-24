@@ -59,8 +59,8 @@ class Base_Connectanator():
 
 
     def find_connected(self, board, spot):
-        o = self.get_player()
-        if board[spot] != o:
+        counter = self.get_player()
+        if board[spot] != counter:
             return [0,0,0,0]
         
         direcs = [(1,0), (0,1), (1,1), (-1,1)]
@@ -75,7 +75,9 @@ class Base_Connectanator():
                 while True:
                     test_spot = (test_spot[0]+d[0]*sign, test_spot[1]+d[1]*sign)
                     try:
-                        if board[test_spot] == o:
+                        if test_spot[0] < 0 or test_spot[1] < 0:
+                            break
+                        elif board[test_spot] == counter:
                             connected += 1
                         else:
                              break
