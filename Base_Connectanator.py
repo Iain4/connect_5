@@ -28,10 +28,7 @@ class Base_Connectanator():
             return None
         
 
-    def place_counter(self, board, move=-1):
-        if move == -1:
-            move = self.move
-
+    def place_counter(self, board, move):
         col = self.board[:, move]
         for i, val in enumerate(col):
             if val != 0:
@@ -94,9 +91,6 @@ class Base_Connectanator():
     
     def set_board(self, board):
         self.board = board.copy()
-    
-    def set_move(self, move):
-        self.move = move
 
     def make_move(self, board)->int:
         """To be implemented for any connect bots. The bot will get the current board from the Game_Happenator and can runs its logic off of that. The function should begin with a self.set_board(board).

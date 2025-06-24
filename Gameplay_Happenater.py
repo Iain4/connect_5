@@ -1,3 +1,4 @@
+import numpy as np
 import pygame as pg
 from Base_Connectanator import Base_Connectanator
 
@@ -22,7 +23,6 @@ class Gameplay_Happenater(Base_Connectanator):
         self.screen = pg.display.set_mode(res)
 
         self.state = None
-        self.state_changed = False
         self.connect_num = connect_num
         self.players = (players[0], players[1])
         self.res = res
@@ -63,15 +63,18 @@ class Gameplay_Happenater(Base_Connectanator):
         if move == None:
             return False
         
-        self.set_move(move)
         self.board, placement = self.place_counter(self.board, move)
         winner = self.win_check(self.board, placement)
-        if not winner:
+        if winner:
+            # lets me find the winning move more easily
+            self.board[placement]
+        else:
+            # no winner so increment turn
             self.turn += 1
         return winner
     
 
-    def game_display(self, show_player=False):
+    def draw_game_board(self, show_player=False):
         self.screen.fill((0,0,150))
         if show_player:
             rect_left = int(self.grid[self.curr_slot*self.rows][0] - 0.5*self.slot_px)
@@ -90,9 +93,11 @@ class Gameplay_Happenater(Base_Connectanator):
             )
         text_surf = self.pg_text.render(f'Slot={self.curr_slot}', False, (0,0,0))
         self.screen.blit(text_surf, (1,1))
+
+    def game_display(self, show_player=False):
+        self.draw_game_board(show_player)
         pg.display.flip()
         self.clock.tick(self.frame_rate)
-
 
     def gaming(self):
         self.game_display(self.players[0] == None or self.players[1] == None)
@@ -106,7 +111,7 @@ class Gameplay_Happenater(Base_Connectanator):
 
         any_win = self.game_turn(move)
         if any_win:
-            self.set_state("won")
+            self.set_state("win")
 
 
     def start_menu(self):
@@ -117,13 +122,41 @@ class Gameplay_Happenater(Base_Connectanator):
         ...
     
 
-    def win_screen(self):
-        self.game_display()
-        self.handle_inputs()
-        if self.state_changed:
+    def win_display(self, win_spots):
+        self.draw_game_board()
+
+        for n, start in enumerate(win_spots[:-1]):
+            end = win_spots[n+1]
+
+            def p_to_px(p):
+                x=int(p[1]*self.slot_px + 0.5*self.slot_px)
+                y=int(p[0]*self.row_px + 0.5*self.row_px)
+                return (x,y)
+            
+            pg.draw.line(
+                surface=self.screen,
+                color="gold",
+                start_pos=p_to_px(start),
+                end_pos=p_to_px(end),
+                width=int(self.cir_rad / 2)
+            )
+        pg.display.flip()
+        self.clock.tick(self.frame_rate)
+
+
+    def win_screen(self, new_win=False):
+        if new_win:
             winner = self.get_player()
             print(f'Player {winner} Wins!!!')
-            print(self.get_board())
+            w_spots = []
+            for i in range(self.rows):
+                for j in range(self.slots):
+                    if self.win_check(self.get_board(), (i,j)):
+                        w_spots += [(i,j)]
+            self.set_state("won")
+            self.win_display(w_spots)
+        
+        self.handle_inputs()
 
 
     def run(self):
@@ -138,6 +171,8 @@ class Gameplay_Happenater(Base_Connectanator):
                     self.gaming()
                 case "paused":
                     self.pause()
+                case "win":
+                    self.win_screen(True)
                 case "won":
                     self.win_screen()
                 case "close":
@@ -145,7 +180,6 @@ class Gameplay_Happenater(Base_Connectanator):
                     break
                 case _:
                     raise ValueError(f"The state <{state}> does not exist.")
-            self.state_changed = False
         pg.quit()
                 
     def get_state(self):
@@ -153,7 +187,6 @@ class Gameplay_Happenater(Base_Connectanator):
 
     def set_state(self, state):
         self.state = state
-        self.state_changed = True
 
     def get_turn(self):
         return self.turn
