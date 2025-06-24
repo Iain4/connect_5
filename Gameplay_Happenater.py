@@ -3,8 +3,9 @@ import pygame as pg
 from Base_Connectanator import Base_Connectanator
 
 # TODO:  
-# - start menu and end of game screen
+# - start menu and end of game screen buttons
 # - draw detection / maximum number of peices
+# - make a not shit bot
 
 class Gameplay_Happenater(Base_Connectanator):
     def __init__(
