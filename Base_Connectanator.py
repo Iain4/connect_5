@@ -76,7 +76,14 @@ class Base_Connectanator():
     def win_check(self, board, spot):
         connecteds = self.find_connected(board, spot, self.get_player())
         if max(connecteds) >= self.connect_num-1:
-            return True
+            return "win"
+        
+        # Checks if its a draw
+        # TODO: end the game and implement a draw screen / state
+        board[spot] == 3
+        if np.all(board[0, :]):
+            return "draw"
+        
         return False
 
     def get_player_name(self):
@@ -96,7 +103,9 @@ class Base_Connectanator():
         self.board = board.copy()
 
     def make_move(self, board)->int:
-        """To be implemented for any connect bots. The bot will get the current board from the Game_Happenator and can runs its logic off of that. The function should begin with a self.set_board(board).
+        """To be implemented for any connect bots. 
+        The bot will get the current board from the Game_Happenator and can runs its logic off of that. 
+        This function should begin with a self.set_board(board).
 
         Parameters
         ----------

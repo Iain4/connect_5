@@ -26,6 +26,7 @@ class Gameplay_Happenater(Base_Connectanator):
         # self.running = False
     
 
+    # TODO: properly seperate the game play handleing and the state handling
     # will need to make handle inputs state depedant
     # or write a new one for each state once i make menus
     def handle_inputs(self):
@@ -33,7 +34,6 @@ class Gameplay_Happenater(Base_Connectanator):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.set_state("close")
-                
             elif event.type == pg.KEYDOWN:
                 match event.key:
                     # escape needs to pause / play etc. so gets its own match case
@@ -63,12 +63,16 @@ class Gameplay_Happenater(Base_Connectanator):
         
         self.board, placement = self.place_counter(self.board, move, self.get_player())
         winner = self.win_check(self.board, placement)
-        if winner:
-            # lets me find the winning move more easily
-            self.board[placement]
-        else:
-            # no winner so increment turn
+        if not winner:    
             self.turn += 1
+        else: 
+            print(winner)
+        # if winner:
+        #     # lets me find the winning move more easily
+        #     self.board[placement]
+        # else:
+        #     # no winner so increment turn
+        #     self.turn += 1
         return winner
     
 
@@ -83,8 +87,7 @@ class Gameplay_Happenater(Base_Connectanator):
             move = player.make_move(self.get_board())
 
         any_win = self.game_turn(move)
-        if any_win:
-            self.set_state("win")
+        return any_win
 
 
     def get_state(self):

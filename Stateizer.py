@@ -25,21 +25,31 @@ class Stateizer(Gameplay_Happenater):
                 for i in range(self.slots) 
                 for j in range(self.rows)
         ]
-        self.cir_rad = int(min([self.row_px, self.slot_px])/2 - 5)
+        padding = max(int(0.08 * min(self.row_px, self.slot_px)), 1)
+        self.cir_rad = int(min([self.row_px, self.slot_px])/2 - padding)
         self.curr_slot = 0
 
+    def handle_inputs(self):
+        input = super().handle_inputs()
+        if self.get_state() == "start_menu" and input != None:
+            self.set_state("gaming") 
+        return input
 
     def run(self):
         # self.set_running(True)
         self.set_state("start_menu")
-        while True:    
+        while True:
             state = self.get_state()
             match state:
                 case "start_menu":
                     self.start_menu()
                 case "gaming":
                     self.game_display(self.players[0] == None or self.players[1] == None)
-                    self.gaming()
+                    result = self.gaming()
+                    if result == "win":
+                        self.set_state("win")
+                    elif result == "draw":
+                        self.set_state("won")
                 case "paused":
                     self.pause()
                 case "win":
@@ -51,6 +61,7 @@ class Stateizer(Gameplay_Happenater):
                     break
                 case _:
                     raise ValueError(f"The state <{state}> does not exist.")
+            self.render()                
         pg.quit()
 
     def render(self):
@@ -84,7 +95,7 @@ class Stateizer(Gameplay_Happenater):
 
     def game_display(self, show_player=False):
         self.draw_game_board(self.get_board(), show_player)
-        self.render()
+        # self.render()
 
 
     ### win / won state ###
@@ -122,7 +133,7 @@ class Stateizer(Gameplay_Happenater):
                 end_pos=p_to_px(end),
                 width=int(self.cir_rad / 2)
             )
-        self.render()
+        # self.render()
 
     
     ### start_menu state ###
@@ -139,11 +150,17 @@ class Stateizer(Gameplay_Happenater):
         start_button.draw(self.screen)
         self.handle_inputs()
         # self.set_state("gaming")
-        self.render()
+        # self.render()
     
 
     ### paused state ###
     def pause(self):
+        pause_surface = pg.Surface(self.res)
+        pause_surface.set_alpha(150)
+        pause_surface.fill((0,0,0))
+
+        self.draw_game_board(self.get_board(), False)
+        self.screen.blit(pause_surface, (0,0))
         self.handle_inputs()
 
 
